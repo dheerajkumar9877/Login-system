@@ -19,28 +19,38 @@ function Login() {
     e.preventDefault();
 
     try{
-      const response = await fetch("http://localhost:5000/login",{
-        method: "POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-          email:email,
-          password:password
-        })
+      const response = await fetch("http://localhost:5000/login", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+              email: email,
+              password: password
+          })
       });
 
-      const data = await response.json() ;
+      const data = await response.json();
 
+      console.log("LOGIN USER:", data.user);
+      
       console.log(data);
 
       if (response.ok) {
-      alert(data.message);
-      navigate("/dashboard");
-    } else {
-      alert(data.message);
-    }
 
+          localStorage.setItem(
+              "user",
+              JSON.stringify(data.user)
+          );
+
+          alert(data.message);
+
+          navigate("/dashboard");
+
+      } else {
+
+          alert(data.message);
+      }
   }catch(err){
       console.log(err);
       alert("Unable to connect to server");
