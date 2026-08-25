@@ -15,13 +15,19 @@ function Forget() {
 
   const [loading, setLoading] = useState(false);
 
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
   const navigate = useNavigate();
 
   async function handelSubmit(e) {
     e.preventDefault();
 
+    setMessage("");
+    setError("");
+
     if (!email) {
-      alert("Please enter your email");
+      setError("Please enter your email");
       return;
     }
 
@@ -44,16 +50,22 @@ function Forget() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Failed to send verification code");
+        setError(
+          data.message || "Failed to send verification code"
+        );
         return;
       }
 
-      alert(data.message);
+      setMessage(
+        data.message || "Verification code sent to your email"
+      );
 
       setShowCode(true);
+
     } catch (error) {
       console.log("Forgot Password Error:", error);
-      alert("Something went wrong");
+      setError("Something went wrong");
+
     } finally {
       setLoading(false);
     }
@@ -62,8 +74,11 @@ function Forget() {
   async function handelVerify(e) {
     e.preventDefault();
 
+    setMessage("");
+    setError("");
+
     if (!code) {
-      alert("Please enter verification code");
+      setError("Please enter verification code");
       return;
     }
 
@@ -89,16 +104,22 @@ function Forget() {
       console.log("VERIFY RESPONSE:", data);
 
       if (!response.ok) {
-        alert(data.message || "Invalid verification code");
+        setError(
+          data.message || "Invalid verification code"
+        );
         return;
       }
 
       setCode("");
       setShowCode(false);
       setShowPasswordForm(true);
+
+      setMessage("Verification successful");
+
     } catch (error) {
       console.log("Verify Code Error:", error);
-      alert("Something went wrong");
+      setError("Something went wrong");
+
     } finally {
       setLoading(false);
     }
@@ -107,13 +128,16 @@ function Forget() {
   async function handelChangePassword(e) {
     e.preventDefault();
 
+    setMessage("");
+    setError("");
+
     if (!password || !repassword) {
-      alert("Please enter both passwords");
+      setError("Please enter both passwords");
       return;
     }
 
     if (password !== repassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
 
@@ -137,19 +161,27 @@ function Forget() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Password reset failed");
+        setError(
+          data.message || "Password reset failed"
+        );
         return;
       }
 
-      alert(data.message);
+      setMessage(
+        data.message || "Password changed successfully"
+      );
 
       setPassword("");
       setRepassword("");
 
-      navigate("/login");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+
     } catch (error) {
       console.log("Reset Password Error:", error);
-      alert("Something went wrong");
+      setError("Something went wrong");
+
     } finally {
       setLoading(false);
     }
@@ -198,6 +230,17 @@ function Forget() {
 
         </div>
 
+        {error && (
+          <div className="mb-5 bg-red-100 border border-red-300 text-red-600 px-4 py-3 rounded-xl text-center">
+            {error}
+          </div>
+        )}
+
+        {message && (
+          <div className="mb-5 bg-green-100 border border-green-300 text-green-600 px-4 py-3 rounded-xl text-center">
+            {message}
+          </div>
+        )}
 
         <div className="flex items-center justify-center mb-8">
 
@@ -251,7 +294,6 @@ function Forget() {
 
         </div>
 
-
         {!showCode && !showPasswordForm && (
 
           <form
@@ -292,7 +334,6 @@ function Forget() {
 
         )}
 
-
         {showCode && (
 
           <form
@@ -325,7 +366,7 @@ function Forget() {
                 onChange={(e) =>
                   setCode(e.target.value)
                 }
-                maxLength="6"
+                maxLength={6}
                 required
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 text-center text-xl tracking-[0.5em] font-bold outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
@@ -345,7 +386,6 @@ function Forget() {
           </form>
 
         )}
-
 
         {showPasswordForm && (
 
@@ -382,7 +422,7 @@ function Forget() {
                   onClick={() =>
                     setShowPassword(!showPassword)
                   }
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-indigo-600"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -390,7 +430,6 @@ function Forget() {
               </div>
 
             </div>
-
 
             <div>
 
@@ -420,7 +459,7 @@ function Forget() {
                   onClick={() =>
                     setShowRepassword(!showRepassword)
                   }
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-indigo-600"
                 >
                   {showRepassword ? "Hide" : "Show"}
                 </button>
@@ -428,7 +467,6 @@ function Forget() {
               </div>
 
             </div>
-
 
             <button
               type="submit"
@@ -443,7 +481,6 @@ function Forget() {
           </form>
 
         )}
-
 
         <p className="text-center text-gray-600 mt-7">
 
